@@ -88,11 +88,11 @@ class Weather():
             if float(value[4]) > MISSING:
                 years_precip[value[1]] = max(float(value[4]), years_precip[value[1]])
         for value in years_list:
-            if years_high[value[1]] == value[2] and value[2] > MISSING:
+            if years_high[value[1]] == float(value[2]) and float(value[2]) > MISSING:
                 count_high[value[1]] += 1
-            if years_low[value[1]] == value[3] and value[3] > MISSING:
+            if years_low[value[1]] == float(value[3]) and float(value[3]) > MISSING:
                 count_low[value[1]] += 1
-            if years_precip[value[1]] == value[4] and value[4] > MISSING:
+            if years_precip[value[1]] == float(value[4]) and float(value[4]) > MISSING:
                 count_precip[value[1]] += 1
         return count_high, count_low, count_precip
 
@@ -101,7 +101,7 @@ class Weather():
         with open(os.path.join(DESKTOP + 'answers', 'YearHistogram.out'), 'a') as f:
             for i in range(1985, 2015):
                 key = str(i)
-                string_data = '{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(
+                string_data = '{}\t{}\t{}\t{}'.format(
                     key, years_high[key], years_low[key], years_precip[key]
                         )
                 f.write(string_data + '\n')
@@ -122,6 +122,7 @@ if __name__ == "__main__":
     for filename in os.listdir(path_wx_data):
         data = []
         new_data = []
+        years_list = []
         with open(os.path.join(path_wx_data, filename)) as inputfile:
             for line in inputfile:
                 data.append(line.strip().split('\t'))
@@ -130,6 +131,7 @@ if __name__ == "__main__":
             g.write_missing_precip(list_of_days, count)
             high, low = g.get_max_min_by_year(list_of_days)
             precip = g.get_total_precip(list_of_days)
-            years_list = g.write_answer_2(filename, high, low, precip)
+            years_list.extend(g.write_answer_2(filename, high, low, precip))
             years_high, years_low, years_precip = g.count_all(years_list)
-            g.write_answer_3(years_high, years_low, years_precip)
+    print(years_list)
+    g.write_answer_3(years_high, years_low, years_precip)
