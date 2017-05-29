@@ -1,6 +1,5 @@
 from collections import namedtuple, defaultdict
 import os
-from argparse import ArgumentParser
 
 DESKTOP = os.path.join(os.path.expanduser("~"), "Desktop/")
 
@@ -54,15 +53,13 @@ class Weather():
 
     def get_total_precip(self, list_of_days):
         total_precip = defaultdict(list)
-        final_precip = defaultdict(int)
+        final_precip = defaultdict(lambda: int(-9999))
         for day in list_of_days:
             total_precip[day.date[:4]].append(float(day.precip))
         for i in range(1985, 2015):
             key = str(i)
             if total_precip[key]:
                 final_precip[key] = sum(total_precip[key])/len(total_precip[key])
-            else:
-                final_precip[key] = MISSING
         return final_precip
 
     def write_answer_2(self, file_name, high_avg, low_avg, total_precip):
