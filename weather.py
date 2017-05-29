@@ -67,10 +67,41 @@ class Weather():
         with open(os.path.join(DESKTOP + 'answers', 'YearlyAverages.out'), 'a') as f:
             for i in range(1985, 2015):
                 key = str(i)
-                string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(file_name, key, high_avg[key], low_avg[key], total_precip[key])
+                string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(
+                    file_name, key, high_avg[key], low_avg[key], total_precip[key])
                 f.write(string_data + '\n')
                 result.append(string_data.split('\t'))
         return result
+
+    def count_all(self, years_list):
+        count_low = 0
+        count_precip = 0
+        lowest = years_list[0][3]
+        high_precip = years_list[0][4]
+        highest = years_list[0][2]
+        for value in years_list:
+            if float(value[2]) > MISSING:
+                highest = max(value[2], highest)
+                year_high[value[1]] = highest
+            if float(value[3]) > MISSING:
+                lowest = min(value[3], lowest)
+                year_low[value[1]] = lowest
+            if float(value[4]) > MISSING:
+                high_precip = max(value[4], high_precip)
+                year_precip[value[1]] = high_precip
+        print(year_low)
+        for value in years_list:
+            if value[2] == year_high[value[1]]:
+                count_high += 1
+            if value[3] == year_low[value[1]]:
+                count_low += 1
+            if value[4] == year_precip[value[1]]:
+                count_precip += 1
+        return count_high, count_low, count_precip
+
+
+
+
 
 
 if __name__ == "__main__":

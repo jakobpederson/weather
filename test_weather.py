@@ -11,6 +11,18 @@ TEST_DATA_02 = [['1989', MISSING, '3', MISSING], ['1990', '3', '4', '8'], ['1991
 
 TEST_DATA_03 = [['a', '1981', 100, 60, MISSING], ['a', '1981', 110, 50, MISSING], ['a', '1981', 120, 40, 6], ['a', '1981', 130, 30, 8]]
 
+TEST_DATA_04 = [
+    ['USC00112348.txt',    '2006',    '155.84',    '48.34',    '30.14'],
+    ['USC00112348.txt',    '2006',    '155.84',    '41.11',    '27.57'],
+    ['USC00112348.txt',    '2006',    '155.84',    '24.34',    '33.08'],
+    ['USC00112348.txt',    '2006',    '151.87',    '39.59',    '-816.72'],
+    ['USC00112348.txt',    '2010',    '-9999.00',    '-9999.00',    '-9999.00'],
+    ['USC00112348.txt',    '2011',    '145.05',    '22.44',    '-7704.15'],
+    ['USC00112348.txt',    '2012',    '189.46',    '64.93',    '-9999.00'],
+    ['USC00112348.txt',    '2013',    '-9999.00',    '-9999.00',    '-9999.00'],
+    ['USC00112348.txt',    '2014',    '171.65',    '71.66',    '-576.98']
+]
+
 
 class WeatherTest(unittest.TestCase):
 
@@ -62,6 +74,9 @@ class WeatherTest(unittest.TestCase):
         precip = self.weather.get_total_precip(list_of_days)
         result = self.weather.write_answer_2(list_of_days[0].file_name, high, low, precip)
         self.assertCountEqual(self.read_into_list_of_lists('YearlyAverages.out'), result)
+
+    def test_x(self):
+        self.fail(self.weather.count_all(TEST_DATA_04))
 
     def read_into_list_of_lists(self, file_name):
         results = []
