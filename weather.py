@@ -23,7 +23,7 @@ class Weather():
                 count += 1
         return count
 
-    def write_missing_precip(self, list_of_days, count, app=False):
+    def write_missing_precip(self, list_of_days, count):
         answer = DESKTOP + 'answers/'
 
 
@@ -69,22 +69,12 @@ class Weather():
                 final_precip[key] = MISSING
         return final_precip
 
-    def write_answer_2(self, file_name, high_avg, low_avg, total_precip, app=False):
+    def write_answer_2(self, file_name, high_avg, low_avg, total_precip):
         result = []
-
-        # if app:
-        #     with open(os.path.join(DESKTOP, 'YearlyAverages.out'), 'a') as f:
-        #         for i in range(1985, 2015):
-        #             key = str(i)
-        #             string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{}'.format(file_name, key, high_avg[key], low_avg[key], str(total_precip[key]))
-        #             f.write(string_data + '\n')
-        #             result.append(string_data.split('\t'))
-
-        # else:
-        with open(os.path.join(DESKTOP, 'YearlyAverages.out'), 'a') as f:
+        with open(os.path.join(DESKTOP + 'answers', 'YearlyAverages.out'), 'a') as f:
             for i in range(1985, 2015):
                 key = str(i)
-                string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{}'.format(file_name, key, high_avg[key], low_avg[key], str(total_precip[key]))
+                string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(file_name, key, high_avg[key], low_avg[key], total_precip[key])
                 f.write(string_data + '\n')
                 result.append(string_data.split('\t'))
         return result
@@ -93,6 +83,11 @@ class Weather():
 if __name__ == "__main__":
     path_wx_data = DESKTOP + 'wx_data/'
     path_yld_data = DESKTOP + 'yld_data/'
+    try:
+        os.remove(DESKTOP + 'answers/' + 'YearlyAverages.out')
+        os.remove(DESKTOP + 'answers/' + 'MissingPrcpData.out')
+    except:
+        pass
     g = Weather()
     for filename in os.listdir(path_wx_data):
         data = []
@@ -102,8 +97,7 @@ if __name__ == "__main__":
                 data.append(line.strip().split('\t'))
             list_of_days = g.convert_to_days(filename, data)
             count = g.count_missing_precipitation(list_of_days)
-            g.write_missing_precip(list_of_days, count, app=True)
+            g.write_missing_precip(list_of_days, count)
             high, low = g.get_max_min_by_year(list_of_days)
             precip = g.get_total_precip(list_of_days)
             g.write_answer_2(filename, high, low, precip)
-
