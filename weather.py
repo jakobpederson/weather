@@ -19,21 +19,17 @@ class Weather():
     def count_missing_precipitation(self, list_of_days):
         count = 0
         for day in list_of_days:
-            if day.high > MISSING and day.low > MISSING and day.precip == MISSING:
+            if int(day.high) > MISSING and int(day.low) > MISSING and int(day.precip) == MISSING:
                 count += 1
         return count
 
     def write_missing_precip(self, list_of_days, count):
         answer = DESKTOP + 'answers/'
-
-
-        # if app:
-        #     with open(os.path.join(answer, 'MissingPrcpData.out'), 'a') as f:
-        #         f.write(list_of_days[0].file_name + "\t" + str(count) + '\n')
-
-        # else:
+        result = []
         with open(os.path.join(answer, 'MissingPrcpData.out'), 'a') as f:
             f.write(list_of_days[0].file_name + "\t" + str(count) + '\n')
+            result.append(str(count))
+        return result
 
     def get_max_min_by_year(self, list_of_days):
         years_high = defaultdict(list)
