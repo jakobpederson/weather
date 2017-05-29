@@ -77,6 +77,9 @@ class Weather():
         years_high = defaultdict(lambda: float(MISSING))
         years_low = defaultdict(lambda: float(9999))
         years_precip = defaultdict(lambda: float(MISSING))
+        count_high = defaultdict(int)
+        count_low = defaultdict(int)
+        count_precip = defaultdict(int)
         for value in years_list:
             if float(value[2]) > MISSING:
                 years_high[value[1]] = max(float(value[2]), years_high[value[1]])
@@ -84,7 +87,26 @@ class Weather():
                 years_low[value[1]] = min(float(value[3]), years_low[value[1]])
             if float(value[4]) > MISSING:
                 years_precip[value[1]] = max(float(value[4]), years_precip[value[1]])
-        return years_high, years_low, years_precip
+        for value in years_list:
+            if years_high[value[1]] == value[2] and value[2] > MISSING:
+                count_high[value[1]] += 1
+            if years_low[value[1]] == value[3] and value[3] > MISSING:
+                count_low[value[1]] += 1
+            if years_precip[value[1]] == value[4] and value[4] > MISSING:
+                count_precip[value[1]] += 1
+        return count_high, count_low, count_precip
+
+    def write_answer_3(self, years_high, years_low, years_precip):
+        result = []
+        with open(os.path.join(DESKTOP + 'answers', 'YearHistogram.out'), 'a') as f:
+            for i in range(1985, 2015):
+                key = str(i)
+                string_data = '{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(
+                    key, years_high[key], years_low[key], years_precip[key]
+                        )
+                f.write(string_data + '\n')
+                result.append(string_data.split('\t'))
+        return result
 
 
 if __name__ == "__main__":
@@ -93,6 +115,7 @@ if __name__ == "__main__":
     try:
         os.remove(DESKTOP + 'answers/' + 'YearlyAverages.out')
         os.remove(DESKTOP + 'answers/' + 'MissingPrcpData.out')
+        os.remove(DESKTOP + 'answers/' + 'YearHistogram.out')
     except:
         pass
     g = Weather()
@@ -107,4 +130,6 @@ if __name__ == "__main__":
             g.write_missing_precip(list_of_days, count)
             high, low = g.get_max_min_by_year(list_of_days)
             precip = g.get_total_precip(list_of_days)
-            g.write_answer_2(filename, high, low, precip)
+            years_list = g.write_answer_2(filename, high, low, precip)
+            years_high, years_low, years_precip = g.count_all(years_list)
+            g.write_answer_3(years_high, years_low, years_precip)
