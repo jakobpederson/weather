@@ -74,34 +74,17 @@ class Weather():
         return result
 
     def count_all(self, years_list):
-        count_low = 0
-        count_precip = 0
-        lowest = years_list[0][3]
-        high_precip = years_list[0][4]
-        highest = years_list[0][2]
+        years_high = defaultdict(lambda: float(MISSING))
+        years_low = defaultdict(lambda: float(9999))
+        years_precip = defaultdict(lambda: float(MISSING))
         for value in years_list:
             if float(value[2]) > MISSING:
-                highest = max(value[2], highest)
-                year_high[value[1]] = highest
+                years_high[value[1]] = max(float(value[2]), years_high[value[1]])
             if float(value[3]) > MISSING:
-                lowest = min(value[3], lowest)
-                year_low[value[1]] = lowest
+                years_low[value[1]] = min(float(value[3]), years_low[value[1]])
             if float(value[4]) > MISSING:
-                high_precip = max(value[4], high_precip)
-                year_precip[value[1]] = high_precip
-        print(year_low)
-        for value in years_list:
-            if value[2] == year_high[value[1]]:
-                count_high += 1
-            if value[3] == year_low[value[1]]:
-                count_low += 1
-            if value[4] == year_precip[value[1]]:
-                count_precip += 1
-        return count_high, count_low, count_precip
-
-
-
-
+                years_precip[value[1]] = max(float(value[4]), years_precip[value[1]])
+        return years_high, years_low, years_precip
 
 
 if __name__ == "__main__":

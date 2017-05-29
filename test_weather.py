@@ -75,8 +75,13 @@ class WeatherTest(unittest.TestCase):
         result = self.weather.write_answer_2(list_of_days[0].file_name, high, low, precip)
         self.assertCountEqual(self.read_into_list_of_lists('YearlyAverages.out'), result)
 
-    def test_x(self):
-        self.fail(self.weather.count_all(TEST_DATA_04))
+    def test_count_all(self):
+        expected = (
+            {'2014': 171.65, '2011': 145.05, '2012': 189.46, '2006': 155.84},
+            {'2014': 71.66, '2011': 22.44, '2012': 64.93, '2006': 24.34},
+            {'2014': -576.98, '2011': -7704.15, '2006': 33.08}
+         )
+        self.assertCountEqual(expected, self.weather.count_all(TEST_DATA_04))
 
     def read_into_list_of_lists(self, file_name):
         results = []
