@@ -83,6 +83,9 @@ class WeatherTest(unittest.TestCase):
          )
         self.assertCountEqual(expected, self.weather.count_all(TEST_DATA_04))
 
+    def text_x(self):
+        self.fail(self.weather.pearson(TEST_DATA_04))
+
     def read_into_list_of_lists(self, file_name):
         results = []
         with open(os.path.join(weather.DESKTOP + 'answers/', file_name)) as inputfile:

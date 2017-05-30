@@ -64,7 +64,7 @@ class Weather():
 
     def write_answer_2(self, file_name, high_avg, low_avg, total_precip):
         result = []
-        with open(os.path.join(DESKTOP + 'answers', 'YearlyAverages.out'), 'a') as f:
+        with open(os.path.join(DESKTOP + 'answers/', 'YearlyAverages.out'), 'a') as f:
             for i in range(1985, 2015):
                 key = str(i)
                 string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(
@@ -108,6 +108,53 @@ class Weather():
                 result.append(string_data.split('\t'))
         return result
 
+    def draw_histogram(self, counts):
+        with open(os.path.join(DESKTOP + 'answers/',  'YearHistogram_draw.txt'), 'a') as f:
+            for i in range(1985, 2015):
+                key = str(i)
+                bar = '{}'.format(key) + counts[key] * '#' + '\n'
+                print(counts[key])
+                f.write(bar)
+
+    def calculate_pearson(self, weather, yields):
+        import math
+        years = len(weather)
+        weather_station_avg = (sum(weather)/len(weather))
+        yield_avg = (sum(yields)/len(yields))
+        diffprod = 0
+        weather_diff2 = 0
+        yield_diff2 = 0
+        for year in range(years):
+            weather_diff = weather[year] - weather_station_avg
+            yield_diff = yields[year] - yield_avg
+            diffprod += weather_diff * yield_diff
+            weather_diff2 += weather_diff * weather_diff
+            yield_diff2 += yield_diff * yield_diff
+        return diffprod / math.sqrt(weather_diff2 * yield_diff2)
+
+    def pearson(self, years_list, check):
+        data = {}
+        weather = defaultdict(float)
+        with open(os.path.join(DESKTOP + 'yld_data/' + 'US_corn_grain_yield.txt')) as f:
+            for line in f:
+                new_list = line.strip().split('\t')
+                data[new_list[0]] = float(new_list[1])
+        for file in years_list:
+            weather[file[1]] = float(file[check])
+        weather_list = [weather.get(x, 0) for x in weather.keys()]
+        yield_list = [data.get(x, 0) for x in data.keys()]
+        return self.calculate_pearson(weather_list, yield_list)
+
+    def write_answer_4(self, years_list):
+        result = []
+        with open(os.path.join(DESKTOP + 'answers/',  'Correlations.out'), 'a') as f:
+            for year in years_list:
+                string_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t'.format(
+                    year[0], self.pearson(years_list, 2), self.pearson(years_list, 3), self.pearson(years_list, 4)
+                )
+                result.append(string_data.strip('\t'))
+            for value in sorted(set(result)):
+                f.write(value + '\n')
 
 if __name__ == "__main__":
     path_wx_data = DESKTOP + 'wx_data/'
@@ -116,6 +163,8 @@ if __name__ == "__main__":
         os.remove(DESKTOP + 'answers/' + 'YearlyAverages.out')
         os.remove(DESKTOP + 'answers/' + 'MissingPrcpData.out')
         os.remove(DESKTOP + 'answers/' + 'YearHistogram.out')
+        os.remove(DESKTOP + 'answers/' + 'YearHistogram_draw.txt')
+        os.remove(DESKTOP + 'answers/' + 'Correlations.out')
     except:
         pass
     g = Weather()
@@ -133,5 +182,9 @@ if __name__ == "__main__":
             precip = g.get_total_precip(list_of_days)
             years_list.extend(g.write_answer_2(filename, high, low, precip))
             years_high, years_low, years_precip = g.count_all(years_list)
-    print(years_list)
+            g.write_answer_4(years_list)
     g.write_answer_3(years_high, years_low, years_precip)
+    g.draw_histogram(years_high)
+    g.draw_histogram(years_low)
+    g.draw_histogram(years_precip)
+
