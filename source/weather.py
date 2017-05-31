@@ -53,7 +53,6 @@ class Weather():
 
     def get_averages_data(self, master_list):
         result = defaultdict(lambda: float(-9999))
-        list_result = []
         for i in range(1985, 2015):
             result[i] = (
                 self.Avg_Data(
@@ -62,14 +61,7 @@ class Weather():
                     precip=10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
                 )
                 )
-            list_result.append(
-                self.Avg_Data(
-                    name=master_list[0][0], year=i,  high=10 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING]),
-                    low=10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
-                    precip=10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
-                )
-            )
-        return result, list_result
+        return result, [x for x in result.values()]
 
     def write_averages_dates(self, result):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'w') as f:
