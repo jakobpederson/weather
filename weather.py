@@ -40,10 +40,7 @@ class Weather():
         return result
 
     def get_missing_precip_dates(self, file_list):
-        result = []
-        for i in range(1985, 2015):
-            result.extend([x.file_name for x in file_list if x.year == i and x.high > MISSING and x.low > MISSING and x.precip == MISSING])
-        return Counter(result)
+        return Counter([x.file_name for x in file_list if x.high > MISSING and x.low > MISSING and x.precip == MISSING])
 
     def write_precip_dates(self, precips):
         with open(os.path.join(ANSWER, 'MissingPrcpData.out'), 'a') as f:
