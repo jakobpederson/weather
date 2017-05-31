@@ -40,5 +40,5 @@ class WeatherTest(unittest.TestCase):
 
     def test_get_averages(self):
         expected = self.c.get_averages_data(self.master_list)
-        # self.c.write_averages_dates(expected)
-        self.fail(expected)
+        self.c.write_averages_dates(expected)
+        self.fail('x')

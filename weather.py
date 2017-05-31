@@ -52,30 +52,29 @@ class Weather():
         return precips
 
     def get_averages_data(self, master_list):
-        result = defaultdict(lambda: float(MISSING))
+        result = defaultdict(lambda: float(-9999))
         self.master_list = master_list
-        for i in range(1985, 2015):
-            print(i)
-            result[i] = (tuple(self.looping_gen(i)))
-        print(result)
+        for name in set([x.file_name for x in master_list]):
+            result[name] = (tuple(self.looping_gen(name).__next__()))
 
             # result[i] = (numpy.mean([x.high for x in master_list if x.date == datum[1] and x.high > MISSING]))
                 # avg_low = numpy.mean([x.low for x in master_list if x.file_name == name and x.date == i and x.low > MISSING])
                 # total_precip = sum([x.precip for x in master_list if x.file_name == name and x.date == i and x.precip > MISSING])
                 # result[name] = [(x.date, avg_high) for x in master_list if x.file_name == name and x.date == i]
                 # result[name] = [(x.date, avg_high, avg_low, total_precip) for x in master_list if x.file_name == name and x.date == i]
-        return
+        return result
 
-    def looping_gen(self, year):
-        for name in set([x.file_name for x in self.master_list]):
-            yield (name, numpy.mean([x.high for x in self.master_list if x.file_name == name and x.date == year and x.high > MISSING]))
-
-
+    def looping_gen(self, name):
+        for i in range(1985, 2015):
+            yield (name, numpy.mean([x.high for x in self.master_list if x.file_name == name and x.date == i and x.high > MISSING]),
+                         numpy.mean([x.low for x in self.master_list if x.file_name == name and x.date == i and x.low > MISSING]),
+                         sum([x.precip for x in self.master_list if x.file_name == name and x.date == i and x.precip > MISSING]),
+            )
 
     def write_averages_dates(self, result):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'w') as f:
             for key, item in result.items():
-                str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(key, item[0], item[1], item[2], item[3])
+                str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(item[0], key, item[1], item[2], item[3])
                 f.write(str_data + '\n')
         return result
 
