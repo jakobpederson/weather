@@ -52,10 +52,10 @@ class WeatherTest(unittest.TestCase):
         self.assertTrue('MissingPrcpData.out' in os.listdir(ANSWER))
 
     def test_get_averages(self):
-        expected = self.c.get_averages_data(self.master_list)
+        expected, _ = self.c.get_averages_data(self.master_list)
         self.c.write_averages_dates(expected)
         self.assertTrue('YearlyAverages.out' in os.listdir(ANSWER))
 
     def test_get_year_histogram(self):
-        file_list = self.c.get_averages_data(self.master_list)
+        _, file_list = self.c.get_averages_data(self.master_list)
         self.fail(self.c.get_year_histogram(file_list))

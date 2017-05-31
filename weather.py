@@ -53,6 +53,7 @@ class Weather():
 
     def get_averages_data(self, master_list):
         result = defaultdict(lambda: float(-9999))
+        list_result = []
         for i in range(1985, 2015):
             result[i] = (
                 self.Avg_Data(
@@ -60,8 +61,15 @@ class Weather():
                     low=10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
                     precip=10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
                 )
+                )
+            list_result.append(
+                self.Avg_Data(
+                    name=master_list[0][0], year=i,  high=10 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING]),
+                    low=10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
+                    precip=10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
+                )
             )
-        return result
+        return result, list_result
 
     def write_averages_dates(self, result):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'w') as f:
@@ -73,7 +81,8 @@ class Weather():
     def get_year_histogram(self, file_list):
         result = []
         for i in range(1985, 2015):
-            result.append((file_list[1985][0], i, max([x.high for x in file_list.values() if x.year == i])))
+            result.append([(x.name, x.year) for x in file_list if x == max([y.high for y in file_list if y.year == i])])
+            # result.append((file_list[i].name, i, max([x.high for x in file_list.values() if x.year == i])))
         return result
 
 
