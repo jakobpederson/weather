@@ -5,7 +5,7 @@ import os
 DESKTOP = os.path.join(os.path.expanduser("~"), "Desktop/")
 ANSWER = DESKTOP + 'answers' + '/'
 
-Day = namedtuple('Day', ['file_name', 'date', 'high', 'low', 'precip'])
+Day = namedtuple('Day', ['file_name', 'date', 'year', 'high', 'low', 'precip'])
 MISSING = -9999
 
 
@@ -16,12 +16,20 @@ class Weather():
         return [
             Day(
                 file_name=file,
-                date=int(value[0][:4].strip()),
+                date=int(value[0]),
+                year=int(value[0][:4].strip()),
                 high=float(value[1].strip()),
                 low=float(value[2].strip()),
                 precip=float(value[3].strip())
             )
         ]
+
+    def process_file(self, file):
+        result = []
+        with open(os.path.join(DESKTOP + 'wx_data' + '/', file)) as f:
+            for line in f:
+                result.extend(self.convert_to_days(file, line))
+        return result
 
     def get_weather_data(self):
         result = []
@@ -31,21 +39,14 @@ class Weather():
                     result.extend(self.convert_to_days(file, line))
         return result
 
-    def write_master_list(self, days):
-        with open(os.path.join(DESKTOP, 'master_list.out'), 'w') as f:
-            for day in days:
-                str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(day.file_name, day.date, day.high, day.low, day.precip)
-                f.write(str_data + '\n')
-        return days
-
-    def get_missing_precip_dates(self, master_list):
+    def get_missing_precip_dates(self, file_list):
         result = []
-        for i in (1985, 2015):
-            result.extend([x.file_name for x in master_list if x.date == i and x.high > MISSING and x.low > MISSING and x.precip == MISSING])
+        for i in range(1985, 2015):
+            result.extend([x.file_name for x in file_list if x.year == i and x.high > MISSING and x.low > MISSING and x.precip == MISSING])
         return Counter(result)
 
     def write_precip_dates(self, precips):
-        with open(os.path.join(ANSWER, 'MissingPrcpData.out'), 'w') as f:
+        with open(os.path.join(ANSWER, 'MissingPrcpData.out'), 'a') as f:
             for key, item in precips.items():
                 str_data = '{}\t{}'.format(key, item)
                 f.write(str_data + '\n')
@@ -53,29 +54,27 @@ class Weather():
 
     def get_averages_data(self, master_list):
         result = defaultdict(lambda: float(-9999))
-        self.master_list = master_list
-        for name in set([x.file_name for x in master_list]):
-            result[name] = (tuple(self.looping_gen(name).__next__()))
-
-            # result[i] = (numpy.mean([x.high for x in master_list if x.date == datum[1] and x.high > MISSING]))
-                # avg_low = numpy.mean([x.low for x in master_list if x.file_name == name and x.date == i and x.low > MISSING])
-                # total_precip = sum([x.precip for x in master_list if x.file_name == name and x.date == i and x.precip > MISSING])
-                # result[name] = [(x.date, avg_high) for x in master_list if x.file_name == name and x.date == i]
-                # result[name] = [(x.date, avg_high, avg_low, total_precip) for x in master_list if x.file_name == name and x.date == i]
-        return result
-
-    def looping_gen(self, name):
         for i in range(1985, 2015):
-            yield (name, numpy.mean([x.high for x in self.master_list if x.file_name == name and x.date == i and x.high > MISSING]),
-                         numpy.mean([x.low for x in self.master_list if x.file_name == name and x.date == i and x.low > MISSING]),
-                         sum([x.precip for x in self.master_list if x.file_name == name and x.date == i and x.precip > MISSING]),
+            result[i] = (
+                (
+                    master_list[0][0], 10 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING]),
+                    10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
+                    10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
+                )
             )
+        return result
 
     def write_averages_dates(self, result):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'w') as f:
             for key, item in result.items():
                 str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(item[0], key, item[1], item[2], item[3])
                 f.write(str_data + '\n')
+        return result
+
+    def get_year_histogram(self, file_list):
+        result = []
+        for i in range(1985, 2015):
+            result.extend((file_list[1985][0], i, max([x[1][1] for x in file_list.items() if x[0] == i])))
         return result
 
 
