@@ -49,14 +49,16 @@ class Weather():
                 f.write(str_data + '\n')
         return precips
 
+    Avg_Data = namedtuple('Avg_Data', ['name', 'year', 'high', 'low', 'precip'])
+
     def get_averages_data(self, master_list):
         result = defaultdict(lambda: float(-9999))
         for i in range(1985, 2015):
             result[i] = (
-                (
-                    master_list[0][0], 10 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING]),
-                    10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
-                    10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
+                self.Avg_Data(
+                    name=master_list[0][0], year=i,  high=10 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING]),
+                    low=10 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING]),
+                    precip=10 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING]),
                 )
             )
         return result
@@ -64,14 +66,14 @@ class Weather():
     def write_averages_dates(self, result):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'w') as f:
             for key, item in result.items():
-                str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(item[0], key, item[1], item[2], item[3])
+                str_data = '{}\t{}\t{:0.2f}\t{:0.2f}\t{:0.2f}'.format(item.name, key, item.high, item.low, item.precip)
                 f.write(str_data + '\n')
         return result
 
     def get_year_histogram(self, file_list):
         result = []
         for i in range(1985, 2015):
-            result.extend((file_list[1985][0], i, max([x[1][1] for x in file_list.items() if x[0] == i])))
+            result.append((file_list[1985][0], i, max([x.high for x in file_list.values() if x.year == i])))
         return result
 
 

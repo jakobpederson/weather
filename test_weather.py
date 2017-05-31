@@ -15,6 +15,14 @@ class WeatherTest(unittest.TestCase):
 
     @classmethod
     def setUp(self):
+        try:
+            os.remove(ANSWER, 'MissingPrcpData.out')
+            os.remove(ANSWER, 'YearlyAverages.out')
+        except:
+            with open(ANSWER + 'MissingPrcpData.out', 'w') as f:
+                pass
+            with open(ANSWER + 'YearlyAverages.out', 'w') as f:
+                pass
         self.c = weather.Weather()
         result = []
         with open(os.path.join(DESKTOP + 'wx_data' + '/', 'USC00110072.txt')):
