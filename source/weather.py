@@ -74,33 +74,38 @@ class Weather():
         return results
 
     def get_year_histogram(self, yearly_averages):
-        new_list = [item for sublist in yearly_averages for item in sublist]
-        names = set([x.name for x in new_list])
-        results = []
-        results_low = []
-        results_precip = []
-        for name in names:
-            avgs = [x.high for x in new_list if x.name == name]
-            avgs_low = [x.low for x in new_list if x.name == name]
-            avgs_prc = [x.precip for x in new_list if x.name == name]
-            if avgs:
-                max_avgs = max(avgs)
-                results.extend([(x.name, x.year) for x in new_list if x.high == max_avgs])
-            if avgs:
-                min_avgs = min(avgs_low)
-                results_low.extend([(x.name, x.year) for x in new_list if x.low == min_avgs])
-            if avgs:
-                max_prc_avgs = max(avgs_prc)
-                results_precip.extend([(x.name, x.year) for x in new_list if x.precip == max_prc_avgs])
-        years_maxes = {}
-        years_lows = {}
-        years_precips = {}
-        for i in range(1985, 2015):
-            years_maxes[i] = len([x for x in results if x[1] == i])
-            years_lows[i] = len([x for x in results_low if x[1] == i])
-            years_precips[i] = len([x for x in results_precip if x[1] == i])
-        self.write_yearhistogram(years_maxes, years_lows, years_precips)
-        return years_maxes, years_lows, years_precips
+        for name in set([x.name for x in yearly_averages]):
+            files_by_name = [x for x in yearly_averages if x.name==name]
+            max_by_file = max([x.high for x in files_by_name])
+            answer.extend([(x.name, x,year) for x in files_by_nae if x.high == max_by_file])
+
+        # new_list = [item for sublist in yearly_averages for item in sublist]
+        # names = set([x.name for x in new_list])
+        # results = []
+        # results_low = []
+        # results_precip = []
+        # for name in names:
+        #     avgs = [x.high for x in new_list if x.name == name]
+        #     avgs_low = [x.low for x in new_list if x.name == name]
+        #     avgs_prc = [x.precip for x in new_list if x.name == name]
+        #     if avgs:
+        #         max_avgs = max(avgs)
+        #         results.extend([(x.name, x.year) for x in new_list if x.high == max_avgs])
+        #     if avgs:
+        #         min_avgs = min(avgs_low)
+        #         results_low.extend([(x.name, x.year) for x in new_list if x.low == min_avgs])
+        #     if avgs:
+        #         max_prc_avgs = max(avgs_prc)
+        #         results_precip.extend([(x.name, x.year) for x in new_list if x.precip == max_prc_avgs])
+        # years_maxes = {}
+        # years_lows = {}
+        # years_precips = {}
+        # for i in range(1985, 2015):
+        #     years_maxes[i] = len([x for x in results if x[1] == i])
+        #     years_lows[i] = len([x for x in results_low if x[1] == i])
+        #     years_precips[i] = len([x for x in results_precip if x[1] == i])
+        # self.write_yearhistogram(years_maxes, years_lows, years_precips)
+        # return years_maxes, years_lows, years_precips
 
     def write_yearhistogram(self, year_maxes, year_lows, year_precips):
         with open(os.path.join(ANSWER, 'YearHistogram.out'), 'a') as f:
@@ -128,5 +133,5 @@ if __name__ == '__main__':
             c.get_missing_prcp_data(file_data)
             data = c.get_yearly_averages(file_data)
             if data:
-                results.append(c.get_yearly_averages(file_data))
+                results.extend(c.get_yearly_averages(file_data))
     c.get_year_histogram(results)
