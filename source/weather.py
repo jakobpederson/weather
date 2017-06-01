@@ -72,19 +72,29 @@ class Weather():
         return results
 
     def get_year_histogram(self, yearly_averages):
-        results = []
-        tops = []
         new_list = [item for sublist in yearly_averages for item in sublist]
+        names = set([x.name for x in new_list])
+        results = []
+        for name in names:
+            avgs = [x.high for x in new_list if x.name == name]
+            if avgs:
+                max_avgs = max(avgs)
+                results.extend([(x.name, x.year) for x in new_list if x.high == max_avgs])
+        years_maxes = []
         for i in range(1985, 2015):
-            for file in os.listdir(path):
-                if file != 'DS_Store':
+            years_maxes.append((i, len([x for x in results if x[1] == i])))
+        return years_maxes
 
-            avg_high = [x.high for x in new_list if x.year == i and x.high > MISSING]
-            if avg_high:
-                maximum_avg_high = max(avg_high)
-            else:
-                maximum_avg_high = -9999
-            results.append([(x.name, x.year) for x in new_list if x.year == i and x.high == maximum_avg_high and x.high > -9999])
+        # results = []
+        # new_list = [item for sublist in yearly_averages for item in sublist]
+        # for i in range(1985, 2015):
+        #     avg_high = [x.high for x in new_list if x.year == i and x.high > MISSING]
+        #     print(avg_high)
+        #     if avg_high:
+        #         maximum_avg_high = max(avg_high)
+        #     else:
+        #         maximum_avg_high = -9999
+        #     results.append([(x.name, x.year) for x in new_list if x.year == i and x.high == maximum_avg_high and x.high > -9999])
 
 
     def write_yearhistogram(self, year_histogram):

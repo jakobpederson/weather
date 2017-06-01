@@ -86,4 +86,3 @@ class WeatherTest(unittest.TestCase):
                 data.extend(self.c.process_file(TEST_DATA, file))
                 results.append(self.c.get_yearly_averages(data))
         self.fail(self.c.get_year_histogram(results))
-        self.assertEqual(expected, self.c.get_year_histogram(results))
