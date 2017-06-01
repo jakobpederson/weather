@@ -19,6 +19,7 @@ FILE_LIST = [
     ]
 
 Day = namedtuple('Day', ['file_name', 'date', 'year', 'high', 'low', 'precip'])
+Avg_Data = namedtuple('Avg_Data', ['name', 'year', 'high', 'low', 'precip'])
 
 
 class WeatherTest(unittest.TestCase):
@@ -68,16 +69,22 @@ class WeatherTest(unittest.TestCase):
         results = self.c.get_missing_prcp_data(data)
         self.assertTrue('USC002.txt' in results.keys())
         self.assertTrue(1 in results.values())
-        self.assertTrue('MissingPrcpData.out' in os.listdir(ANSWER))
 
     def test_get_yearly_averages(self):
         data = []
         with open(os.path.join(TEST_DATA + '/', 'USC001.txt')):
             data.extend(self.c.process_file(TEST_DATA, 'USC001.txt'))
-        results = self.c.get_yearly_averages(data)
-        expected = [Avg_Data(name='USC001.txt', year=1989, high=0.68000000000000005, low=-9.120000000000001, precip=0.60000000000000009)]
-        self.assertCounEqual(expected, results)
-        self.fail([x for x in results if x.year == 1989])
+        results = [x for x in self.c.get_yearly_averages(data) if x.year == 1989]
+        expected = [
+            Avg_Data(
+                name='USC001.txt',
+                year=1989,
+                high=0.68000000000000005,
+                low=-9.120000000000001,
+                precip=0.60000000000000009
+                )
+            ]
+        self.assertCountEqual(expected, results)
 
     def test_get_year_histogram(self):
         data = []
@@ -95,4 +102,21 @@ class WeatherTest(unittest.TestCase):
                 data.extend(self.c.process_file(TEST_DATA, file))
                 results.extend(self.c.get_yearly_averages(data))
         self.assertCountEqual(expected, self.c.get_year_histogram(results))
+
+    def test_get_correlations(self):
+        results = []
+        for file in os.listdir(TEST_DATA):
+            data = []
+            if file != '.DS_Store':
+                data.extend(self.c.process_file(TEST_DATA, file))
+                results.extend(self.c.get_yearly_averages(data))
+        expected = [
+                ['USC001.txt', -0.19561181192180047, -0.1956118119218006, -0.19561181192180063],
+                ['USC002.txt', -0.41185959065919558, -0.41185959065919542, -0.4118595906591957],
+                ['USC003.txt', -0.22889302724119787, -0.22889302724119784, -0.22889302724119795],
+                ['USC004.txt', -0.13797713187964089, -0.13797713187964089, -0.13797713187964095],
+                ['USC005.txt', -0.084008388987234991, -0.084008388987235047, -0.084008388987235019]
+            ]
+        self.assertEqual(0.8660254037844386, self.c.calculate_correlation([1, 3, 4, 4], [2, 5, 5, 8])[0])
+        self.assertCountEqual(expected, self.c.get_correlations(results, self.c.get_yld_data()))
 

@@ -115,6 +115,46 @@ class Weather():
         file3 = open(CODE_EXAM + '/answers' + '/' + 'YearHistogram.out', 'w')
         return file1, file2, file3
 
+    def get_correlations(self, results, yld_data):
+        answers = []
+        for file in set([x.name for x in results]):
+            weather_station = [(x.high, x.low, x.precip) for x in results if x.name == file]
+            answers.append(
+                [
+                    file,
+                    self.calculate_correlation([x[0] for x in weather_station], yld_data)[0],
+                    self.calculate_correlation([x[1] for x in weather_station], yld_data)[0],
+                    self.calculate_correlation([x[2] for x in weather_station], yld_data)[0]
+                ]
+            )
+        self.write_correlations(answers)
+        return answers
+
+    def calculate_correlation(self, x, y):
+        from scipy.stats.stats import pearsonr
+        return pearsonr(x, y)
+
+    def get_yld_data(self):
+        data = []
+        with open(os.path.join(CODE_EXAM + '/yld_data/' + 'US_corn_grain_yield.txt')) as f:
+            for line in f:
+                data.append(float(line.strip().split('\t')[1]))
+        return data
+
+    def write_correlations(self, answers):
+        result = []
+        with open(os.path.join(CODE_EXAM + '/answers/',  'Correlations.out'), 'a') as f:
+            for answer in answers:
+                string_data = '{}\t{:0.2f}\t{:0.2f}\t{:0.2f}\t'.format(
+                    answer[0],
+                    answer[1],
+                    answer[2],
+                    answer[3],
+                )
+                result.append(string_data.strip('\t'))
+            for value in sorted(set(result)):
+                f.write(value + '\n')
+
 if __name__ == '__main__':
     c = Weather()
     c.start_up()
@@ -128,3 +168,4 @@ if __name__ == '__main__':
             if data:
                 results.extend(c.get_yearly_averages(file_data))
     c.get_year_histogram(results)
+    c.get_correlations(results, c.get_yld_data())
