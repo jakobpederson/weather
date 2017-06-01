@@ -50,12 +50,14 @@ class Weather():
 
     def get_yearly_averages(self, master_list):
         results = defaultdict(lambda: ('x', 1, -9999, -9999, -9999))
+        if not master_list:
+            return
         for i in range(1985, 2015):
             hi = 0.1 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING])
             lo = 0.1 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING])
             prc = 0.1 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING])
             results[i] = (
-                    master_list[0][0],
+                    master_list[0].file_name,
                     i,
                     hi if not math.isnan(hi) else -9999,
                     lo if not math.isnan(lo) else -9999,
@@ -107,5 +109,23 @@ class Weather():
                 f.write(str_data + '\n')
             return []
 
-if name == '__main__':
-    for file in os.
+if __name__ == '__main__':
+    c = Weather()
+    yearly_avg = []
+    try:
+        os.remove(CODE_EXAM + '/wx_data' + '/', 'MissingPrcpData.out')
+        os.remove(CODE_EXAM + '/wx_data' + '/', 'YearlyAverages.out')
+        os.remove(CODE_EXAM + '/wx_data' + '/', 'YearHistogram.out')
+    except:
+        pass
+    file1 = open(CODE_EXAM + '/wx_data' + '/' + 'MissingPrcpData.out', 'w')
+    file2 = open(CODE_EXAM + '/wx_data' + '/' + 'YearlyAverages.out', 'w')
+    file3 = open(CODE_EXAM + '/wx_data' + '/' + 'YearHistogram.out', 'w')
+    results = []
+    for file in os.listdir(CODE_EXAM + '/wx_data' + '/'):
+        if file != 'DS_Store':
+            file_data = c.process_file(CODE_EXAM + '/wx_data' + '/', file)
+            results.extend(file_data)
+            c.get_missing_prcp_data(file_data)
+            c.get_yearly_averages(file_data)
+

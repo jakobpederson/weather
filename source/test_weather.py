@@ -76,6 +76,7 @@ class WeatherTest(unittest.TestCase):
             data.extend(self.c.process_file(TEST_DATA, 'USC001.txt'))
         results = self.c.get_yearly_averages(data)
         self.assertTrue(results[1989] == ('USC001.txt', 1989, 0.68000000000000005, -9.120000000000001, 3.0))
+        self.fail('x')
         self.assertTrue('YearlyAverages.out' in os.listdir(ANSWER))
 
     def test_get_year_histogram(self):
@@ -88,3 +89,4 @@ class WeatherTest(unittest.TestCase):
                 data.extend(self.c.process_file(TEST_DATA, file))
                 results.append(self.c.get_yearly_averages(data))
         self.assertCountEqual(expected, self.c.get_year_histogram(results))
+
