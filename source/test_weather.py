@@ -7,7 +7,7 @@ import weather
 CODE_EXAM = os.path.abspath(os.path.join(__file__, "../.."))
 SOURCE = os.path.dirname(os.path.realpath(__file__))
 TEST_DATA = SOURCE + '/' + 'tests'
-ANSWER = CODE_EXAM + '/' + 'answers'
+ANSWER = CODE_EXAM + '/' + 'answers' + '/'
 MISSING = -9999
 PATH_WX = CODE_EXAM + 'wx_data' + '/'
 FILE_LIST = [
@@ -75,19 +75,24 @@ class WeatherTest(unittest.TestCase):
         with open(os.path.join(TEST_DATA + '/', 'USC001.txt')):
             data.extend(self.c.process_file(TEST_DATA, 'USC001.txt'))
         results = self.c.get_yearly_averages(data)
-        self.assertTrue(results[1989] == ('USC001.txt', 1989, 0.68000000000000005, -9.120000000000001, 3.0))
-        self.fail('x')
-        self.assertTrue('YearlyAverages.out' in os.listdir(ANSWER))
+        expected = [Avg_Data(name='USC001.txt', year=1989, high=0.68000000000000005, low=-9.120000000000001, precip=0.60000000000000009)]
+        self.assertCounEqual(expected, results)
+        self.fail([x for x in results if x.year == 1989])
 
     def test_get_year_histogram(self):
         data = []
         results = []
-        expected = {1985: 1, 1986: 1, 1987: 1, 1988: 1, 1989: 1, 1990: 0, 1991: 0, 1992: 0, 1993: 0, 1994: 0, 1995: 0, 1996: 0, 1997: 0, 1998: 0, 1999: 0, 2000: 0, 2001: 0, 2002: 0,2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0,2013: 0, 2014: 0}, {1985: 20, 1986: 20, 1987: 20, 1988: 20, 1989: 20, 1990: 25, 1991: 25,1992: 25, 1993: 25, 1994: 25, 1995: 25, 1996: 25, 1997: 25, 1998: 25, 1999: 25, 2000: 25,2001: 25, 2002: 25, 2003: 25, 2004: 25, 2005: 25, 2006: 25, 2007: 25, 2008: 25, 2009: 25,2010: 25, 2011: 25, 2012: 25, 2013: 25, 2014: 25}, {1985: 1, 1986: 1, 1987: 1, 1988: 1, 1989: 1, 1990: 0, 1991: 0, 1992: 0, 1993: 0, 1994: 0, 1995: 0, 1996: 0, 1997: 0, 1998: 0, 1999: 0, 2000: 0, 2001: 0, 2002: 0, 2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0, 2014: 0}
+        expected = [
+            (1985, 1, 1, 1), (1986, 1, 1, 1), (1987, 1, 1, 1), (1988, 1, 1, 1), (1989, 1, 1, 1), (1990, 0, 0, 0),
+            (1991, 0, 0, 0), (1992, 0, 0, 0), (1993, 0, 0, 0), (1994, 0, 0, 0), (1995, 0, 0, 0), (1996, 0, 0, 0),
+            (1997, 0, 0, 0), (1998, 0, 0, 0), (1999, 0, 0, 0), (2000, 0, 0, 0), (2001, 0, 0, 0), (2002, 0, 0, 0),
+            (2003, 0, 0, 0), (2004, 0, 0, 0), (2005, 0, 0, 0), (2006, 0, 0, 0), (2007, 0, 0, 0), (2008, 0, 0, 0),
+            (2009, 0, 0, 0), (2010, 0, 0, 0), (2011, 0, 0, 0), (2012, 0, 0, 0), (2013, 0, 0, 0), (2014, 0, 0, 0)
+         ]
         for file in os.listdir(TEST_DATA):
             data = []
             if file != '.DS_Store':
                 data.extend(self.c.process_file(TEST_DATA, file))
                 results.extend(self.c.get_yearly_averages(data))
-        self.fail(self.c.get_year_histogram(results))
         self.assertCountEqual(expected, self.c.get_year_histogram(results))
 

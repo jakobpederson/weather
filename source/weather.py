@@ -53,18 +53,23 @@ class Weather():
         if not master_list:
             return
         for i in range(1985, 2015):
-            hi = 0.1 * numpy.mean([x.high for x in master_list if x.year == i and x.high > MISSING])
-            lo = 0.1 * numpy.mean([x.low for x in master_list if x.year == i and x.low > MISSING])
-            prc = 0.1 * sum([x.precip for x in master_list if x.year == i and x.precip > MISSING])
+            hi = self.get_average_if_len_gt_zero([x.high for x in master_list if x.year == i and x.high > MISSING])
+            lo = self.get_average_if_len_gt_zero([x.low for x in master_list if x.year == i and x.low > MISSING])
+            prc = self.get_average_if_len_gt_zero([x.precip for x in master_list if x.year == i and x.precip > MISSING])
             results[i] = (
                     master_list[0].file_name,
                     i,
-                    hi if not math.isnan(hi) else -9999,
-                    lo if not math.isnan(lo) else -9999,
+                    hi,
+                    lo,
                     prc if prc != 0 else -9999,
                 )
         self.write_yearlyaverages(results)
         return [Avg_Data(name=x[0], year=x[1], high=x[2], low=x[3], precip=x[4]) for x in results.values()]
+
+    def get_average_if_len_gt_zero(self, data):
+        if len(data) > 0:
+            return 0.1 * numpy.mean(data)
+        return -9999
 
     def write_yearlyaverages(self, results):
         with open(os.path.join(ANSWER, 'YearlyAverages.out'), 'a') as f:
@@ -75,65 +80,48 @@ class Weather():
 
     def get_year_histogram(self, yearly_averages):
         answer = []
+        answer_low = []
+        answer_precip = []
         results = []
         for name in set([x.name for x in yearly_averages]):
             files_by_name = [x for x in yearly_averages if x.name == name]
-            max_by_file = max([x.high for x in files_by_name])
-            answer.extend([(x.name, x.year) for x in files_by_name if x.high == max_by_file])
+            high_by_file = max([x.high for x in files_by_name])
+            low_by_file = min([x.low for x in files_by_name if x.low > MISSING])
+            precip_by_file = max([x.precip for x in files_by_name])
+            answer.extend([(x.name, x.year) for x in files_by_name if x.high == high_by_file])
+            answer_low.extend([(x.name, x.year) for x in files_by_name if x.low == low_by_file])
+            answer_precip.extend([(x.name, x.year) for x in files_by_name if x.precip == precip_by_file])
         for i in range(1985, 2015):
-            results.append((i, len([x for x in answer if x[1] == i])))
+            results.append((i, len([x for x in answer if x[1] == i]), len([x for x in answer_low if x[1] == i]), len([x for x in answer_precip if x[1] == i])))
+        self.write_yearhistogram(results)
         return results
 
-        # new_list = [item for sublist in yearly_averages for item in sublist]
-        # names = set([x.name for x in new_list])
-        # results = []
-        # results_low = []
-        # results_precip = []
-        # for name in names:
-        #     avgs = [x.high for x in new_list if x.name == name]
-        #     avgs_low = [x.low for x in new_list if x.name == name]
-        #     avgs_prc = [x.precip for x in new_list if x.name == name]
-        #     if avgs:
-        #         max_avgs = max(avgs)
-        #         results.extend([(x.name, x.year) for x in new_list if x.high == max_avgs])
-        #     if avgs:
-        #         min_avgs = min(avgs_low)
-        #         results_low.extend([(x.name, x.year) for x in new_list if x.low == min_avgs])
-        #     if avgs:
-        #         max_prc_avgs = max(avgs_prc)
-        #         results_precip.extend([(x.name, x.year) for x in new_list if x.precip == max_prc_avgs])
-        # years_maxes = {}
-        # years_lows = {}
-        # years_precips = {}
-        # for i in range(1985, 2015):
-        #     years_maxes[i] = len([x for x in results if x[1] == i])
-        #     years_lows[i] = len([x for x in results_low if x[1] == i])
-        #     years_precips[i] = len([x for x in results_precip if x[1] == i])
-        # self.write_yearhistogram(years_maxes, years_lows, years_precips)
-        # return years_maxes, years_lows, years_precips
-
-    def write_yearhistogram(self, year_maxes, year_lows, year_precips):
+    def write_yearhistogram(self, results):
         with open(os.path.join(ANSWER, 'YearHistogram.out'), 'a') as f:
-            for i in range(1985, 2015):
-                str_data = '{}\t{}\t{}\t{}'.format(i, year_maxes[i], year_lows[i], year_precips[i])
+            for result in results:
+                str_data = '{}\t{}\t{}\t{}'.format(result[0], result[1], result[2], result[3])
                 f.write(str_data + '\n')
             return []
 
+    def start_up(self):
+        try:
+            os.remove(CODE_EXAM + '/answers' + '/', 'MissingPrcpData.out')
+            os.remove(CODE_EXAM + '/answers' + '/', 'YearlyAverages.out')
+            os.remove(CODE_EXAM + '/answers' + '/', 'YearHistogram.out')
+        except:
+            pass
+        file1 = open(CODE_EXAM + '/answers' + '/' + 'MissingPrcpData.out', 'w')
+        file2 = open(CODE_EXAM + '/answers' + '/' + 'YearlyAverages.out', 'w')
+        file3 = open(CODE_EXAM + '/answers' + '/' + 'YearHistogram.out', 'w')
+        return file1, file2, file3
+
 if __name__ == '__main__':
     c = Weather()
+    c.start_up()
     yearly_avg = []
-    try:
-        os.remove(CODE_EXAM + '/wx_data' + '/', 'MissingPrcpData.out')
-        os.remove(CODE_EXAM + '/wx_data' + '/', 'YearlyAverages.out')
-        os.remove(CODE_EXAM + '/wx_data' + '/', 'YearHistogram.out')
-    except:
-        pass
-    file1 = open(CODE_EXAM + '/wx_data' + '/' + 'MissingPrcpData.out', 'w')
-    file2 = open(CODE_EXAM + '/wx_data' + '/' + 'YearlyAverages.out', 'w')
-    file3 = open(CODE_EXAM + '/wx_data' + '/' + 'YearHistogram.out', 'w')
     results = []
     for file in os.listdir(CODE_EXAM + '/wx_data' + '/'):
-        if file != 'DS_Store':
+        if file != '.DS_Store':
             file_data = c.process_file(CODE_EXAM + '/wx_data' + '/', file)
             c.get_missing_prcp_data(file_data)
             data = c.get_yearly_averages(file_data)
