@@ -87,6 +87,7 @@ class WeatherTest(unittest.TestCase):
             data = []
             if file != '.DS_Store':
                 data.extend(self.c.process_file(TEST_DATA, file))
-                results.append(self.c.get_yearly_averages(data))
+                results.extend(self.c.get_yearly_averages(data))
+        self.fail(self.c.get_year_histogram(results))
         self.assertCountEqual(expected, self.c.get_year_histogram(results))
 
