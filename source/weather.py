@@ -74,10 +74,13 @@ class Weather():
         return results
 
     def get_year_histogram(self, yearly_averages):
+        answer = []
         for name in set([x.name for x in yearly_averages]):
-            files_by_name = [x for x in yearly_averages if x.name==name]
+            files_by_name = [x for x in yearly_averages if x.name == name]
             max_by_file = max([x.high for x in files_by_name])
-            answer.extend([(x.name, x,year) for x in files_by_nae if x.high == max_by_file])
+            answer.extend([(x.name, x.year) for x in files_by_name if x.high == max_by_file])
+        for i in range(1985, 2015):
+            (i, len([x for x in answer if x[1] == i]))
 
         # new_list = [item for sublist in yearly_averages for item in sublist]
         # names = set([x.name for x in new_list])
