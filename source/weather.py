@@ -125,7 +125,8 @@ if __name__ == '__main__':
     for file in os.listdir(CODE_EXAM + '/wx_data' + '/'):
         if file != 'DS_Store':
             file_data = c.process_file(CODE_EXAM + '/wx_data' + '/', file)
-            results.extend(file_data)
             c.get_missing_prcp_data(file_data)
-            c.get_yearly_averages(file_data)
-
+            data = c.get_yearly_averages(file_data)
+            if data:
+                results.append(c.get_yearly_averages(file_data))
+    c.get_year_histogram(results)
