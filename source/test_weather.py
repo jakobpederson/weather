@@ -28,9 +28,11 @@ class WeatherTest(unittest.TestCase):
         try:
             os.remove(ANSWER, 'MissingPrcpData.out')
             os.remove(ANSWER, 'YearlyAverages.out')
+            os.remove(ANSWER, 'YearHistogram.out')
         except:
             open(ANSWER + 'MissingPrcpData.out', 'w')
             open(ANSWER + 'YearlyAverages.out', 'w')
+            open(ANSWER + 'YearHistogram.out', 'w')
         self.c = weather.Weather()
 
     def test_read_line(self):
@@ -79,10 +81,10 @@ class WeatherTest(unittest.TestCase):
     def test_get_year_histogram(self):
         data = []
         results = []
-        expected = {'USC004.txt': 1, 'USC002.txt': 1, 'USC003.txt': 1, 'USC001.txt': 1, 'USC005.txt': 1}
+        expected = {1985: 1, 1986: 1, 1987: 1, 1988: 1, 1989: 1, 1990: 0, 1991: 0, 1992: 0, 1993: 0, 1994: 0, 1995: 0, 1996: 0, 1997: 0, 1998: 0, 1999: 0, 2000: 0, 2001: 0, 2002: 0,2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0,2013: 0, 2014: 0}, {1985: 20, 1986: 20, 1987: 20, 1988: 20, 1989: 20, 1990: 25, 1991: 25,1992: 25, 1993: 25, 1994: 25, 1995: 25, 1996: 25, 1997: 25, 1998: 25, 1999: 25, 2000: 25,2001: 25, 2002: 25, 2003: 25, 2004: 25, 2005: 25, 2006: 25, 2007: 25, 2008: 25, 2009: 25,2010: 25, 2011: 25, 2012: 25, 2013: 25, 2014: 25}, {1985: 1, 1986: 1, 1987: 1, 1988: 1, 1989: 1, 1990: 0, 1991: 0, 1992: 0, 1993: 0, 1994: 0, 1995: 0, 1996: 0, 1997: 0, 1998: 0, 1999: 0, 2000: 0, 2001: 0, 2002: 0, 2003: 0, 2004: 0, 2005: 0, 2006: 0, 2007: 0, 2008: 0, 2009: 0, 2010: 0, 2011: 0, 2012: 0, 2013: 0, 2014: 0}
         for file in os.listdir(TEST_DATA):
             data = []
             if file != '.DS_Store':
                 data.extend(self.c.process_file(TEST_DATA, file))
                 results.append(self.c.get_yearly_averages(data))
-        self.fail(self.c.get_year_histogram(results))
+        self.assertCountEqual(expected, self.c.get_year_histogram(results))

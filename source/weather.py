@@ -75,29 +75,37 @@ class Weather():
         new_list = [item for sublist in yearly_averages for item in sublist]
         names = set([x.name for x in new_list])
         results = []
+        results_low = []
+        results_precip = []
         for name in names:
             avgs = [x.high for x in new_list if x.name == name]
+            avgs_low = [x.low for x in new_list if x.name == name]
+            avgs_prc = [x.precip for x in new_list if x.name == name]
             if avgs:
                 max_avgs = max(avgs)
                 results.extend([(x.name, x.year) for x in new_list if x.high == max_avgs])
-        years_maxes = []
+            if avgs:
+                min_avgs = min(avgs_low)
+                results_low.extend([(x.name, x.year) for x in new_list if x.low == min_avgs])
+            if avgs:
+                max_prc_avgs = max(avgs_prc)
+                results_precip.extend([(x.name, x.year) for x in new_list if x.precip == max_prc_avgs])
+        years_maxes = {}
+        years_lows = {}
+        years_precips = {}
         for i in range(1985, 2015):
-            years_maxes.append((i, len([x for x in results if x[1] == i])))
-        return years_maxes
+            years_maxes[i] = len([x for x in results if x[1] == i])
+            years_lows[i] = len([x for x in results_low if x[1] == i])
+            years_precips[i] = len([x for x in results_precip if x[1] == i])
+        self.write_yearhistogram(years_maxes, years_lows, years_precips)
+        return years_maxes, years_lows, years_precips
 
-        # results = []
-        # new_list = [item for sublist in yearly_averages for item in sublist]
-        # for i in range(1985, 2015):
-        #     avg_high = [x.high for x in new_list if x.year == i and x.high > MISSING]
-        #     print(avg_high)
-        #     if avg_high:
-        #         maximum_avg_high = max(avg_high)
-        #     else:
-        #         maximum_avg_high = -9999
-        #     results.append([(x.name, x.year) for x in new_list if x.year == i and x.high == maximum_avg_high and x.high > -9999])
-
-
-    def write_yearhistogram(self, year_histogram):
+    def write_yearhistogram(self, year_maxes, year_lows, year_precips):
         with open(os.path.join(ANSWER, 'YearHistogram.out'), 'a') as f:
-            for key, item in year_histogram:
-                str_data = '{}\t{}\t{}'.format(item[0], item[1], item[3])
+            for i in range(1985, 2015):
+                str_data = '{}\t{}\t{}\t{}'.format(i, year_maxes[i], year_lows[i], year_precips[i])
+                f.write(str_data + '\n')
+            return []
+
+if name == '__main__':
+    for file in os.
