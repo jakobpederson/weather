@@ -1,5 +1,4 @@
 from collections import namedtuple, defaultdict, Counter
-import math
 import numpy
 import os
 
@@ -84,13 +83,12 @@ class Weather():
         answer_precip = []
         results = []
         for name in set([x.name for x in yearly_averages]):
-            files_by_name = [x for x in yearly_averages if x.name == name]
-            high_by_file = max([x.high for x in files_by_name])
-            low_by_file = min([x.low for x in files_by_name if x.low > MISSING])
-            precip_by_file = max([x.precip for x in files_by_name])
-            answer.extend([(x.name, x.year) for x in files_by_name if x.high == high_by_file])
-            answer_low.extend([(x.name, x.year) for x in files_by_name if x.low == low_by_file])
-            answer_precip.extend([(x.name, x.year) for x in files_by_name if x.precip == precip_by_file])
+            high_by_file = max([x.high for x in yearly_averages if x == name])
+            low_by_file = min([x.low for x in yearly_averages if x.low > MISSING and x == name])
+            precip_by_file = max([x.precip for x in yearly_averages if x == name])
+            answer.extend([(x.name, x.year) for x in yearly_averages if x == name and x.high == high_by_file])
+            answer_low.extend([(x.name, x.year) for x in yearly_averages if x == name and x.low == low_by_file])
+            answer_precip.extend([(x.name, x.year) for x in yearly_averages if x == name and x.precip == precip_by_file])
         for i in range(1985, 2015):
             results.append((i, len([x for x in answer if x[1] == i]), len([x for x in answer_low if x[1] == i]), len([x for x in answer_precip if x[1] == i])))
         self.write_yearhistogram(results)
@@ -105,15 +103,17 @@ class Weather():
 
     def start_up(self):
         try:
-            os.remove(CODE_EXAM + '/answers' + '/', 'MissingPrcpData.out')
-            os.remove(CODE_EXAM + '/answers' + '/', 'YearlyAverages.out')
-            os.remove(CODE_EXAM + '/answers' + '/', 'YearHistogram.out')
+            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'MissingPrcpData.out')
+            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'YearlyAverages.out')
+            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'YearHistogram.out')
+            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'Correlation.out')
         except:
             pass
-        file1 = open(CODE_EXAM + '/answers' + '/' + 'MissingPrcpData.out', 'w')
-        file2 = open(CODE_EXAM + '/answers' + '/' + 'YearlyAverages.out', 'w')
-        file3 = open(CODE_EXAM + '/answers' + '/' + 'YearHistogram.out', 'w')
-        return file1, file2, file3
+        file1 = open(CODE_EXAM + '/' + 'answers' + '/' + 'MissingPrcpData.out', 'w')
+        file2 = open(CODE_EXAM + '/' + 'answers' + '/' + 'YearlyAverages.out', 'w')
+        file3 = open(CODE_EXAM + '/' + 'answers' + '/' + 'YearHistogram.out', 'w')
+        file4 = open(CODE_EXAM + '/' + 'answers' + '/' + 'Correlation.out', 'w')
+        return file1, file2, file3, file4
 
     def get_correlations(self, results, yld_data):
         answers = []
