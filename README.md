@@ -1,15 +1,3 @@
-Overview
---------
-
-Save the attached file to your workspace and unpack the files. You should now have a folder, coding-data-exam, with three sub-folders:
-
-        wx_data/        Weather data files
-        yld_data/       Yield data files
-        answers/        Empty folder where you will place your answers to the questions on this exam
-        src/            Empty folder where you will place your source code that generated the answers
-        
-You can use whatever software tools you would like to answer the exam problems. Each problem will require some development and analysis from you. Read the instructions carefully-- you will be graded for your ability to provide the precise answer to these problems.
-
 Weather Data Description
 ------------------------
 
@@ -53,7 +41,3 @@ Output should be written to the file YearHistogram.out in the answers folder. Th
 Problem 4
 ---------
 Use the annual average maximum temperature, annual average minimum temperature, and total annual precipitation results from Problem 2 and calculate the Pearson correlation between these variables and the grain yield data stored in US_corn_grain_yield.txt. Output the correlations for every station. Write your output to the file Correlations.out in the answers folder. The columns of the file should be separated by tabs and will contain the filename of the weather station (e.g. USC00339312.txt) and the three correlation values to 2 decimal places. Sort the output in ascending order by filename.
-
-Conclusion
-----------
-When you have completed the exam create a compressed archive of the answers/ and src/ folders and email it to the hiring manager or your contracting representative.
