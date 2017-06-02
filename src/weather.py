@@ -1,6 +1,7 @@
 from collections import namedtuple, defaultdict, Counter
 import numpy
 import os
+from scipy.stats.stats import pearsonr
 
 CODE_EXAM = os.path.abspath(os.path.join(__file__, "../.."))
 SOURCE = os.path.dirname(os.path.realpath(__file__))
@@ -83,14 +84,23 @@ class Weather():
         answer_precip = []
         results = []
         for name in set([x.name for x in yearly_averages]):
-            high_by_file = max([x.high for x in yearly_averages if x == name])
-            low_by_file = min([x.low for x in yearly_averages if x.low > MISSING and x == name])
-            precip_by_file = max([x.precip for x in yearly_averages if x == name])
-            answer.extend([(x.name, x.year) for x in yearly_averages if x == name and x.high == high_by_file])
-            answer_low.extend([(x.name, x.year) for x in yearly_averages if x == name and x.low == low_by_file])
-            answer_precip.extend([(x.name, x.year) for x in yearly_averages if x == name and x.precip == precip_by_file])
+            high_by_file = max([x.high for x in yearly_averages if x.name == name])
+            low_by_file = min([x.low for x in yearly_averages if x.low > MISSING and x.name == name])
+            precip_by_file = max([x.precip for x in yearly_averages if x.name == name])
+            answer.extend([(x.name, x.year) for x in yearly_averages if x.high == high_by_file and x.name == name])
+            answer_low.extend([(x.name, x.year) for x in yearly_averages if x.low == low_by_file and x.name == name])
+            answer_precip.extend(
+                [(x.name, x.year) for x in yearly_averages if x.precip == precip_by_file and x.name == name]
+            )
         for i in range(1985, 2015):
-            results.append((i, len([x for x in answer if x[1] == i]), len([x for x in answer_low if x[1] == i]), len([x for x in answer_precip if x[1] == i])))
+            results.append(
+                (
+                    i,
+                    len([x for x in answer if x[1] == i]),
+                    len([x for x in answer_low if x[1] == i]),
+                    len([x for x in answer_precip if x[1] == i])
+                )
+            )
         self.write_yearhistogram(results)
         return results
 
@@ -106,13 +116,13 @@ class Weather():
             os.remove(CODE_EXAM + '/' + 'answers' + '/', 'MissingPrcpData.out')
             os.remove(CODE_EXAM + '/' + 'answers' + '/', 'YearlyAverages.out')
             os.remove(CODE_EXAM + '/' + 'answers' + '/', 'YearHistogram.out')
-            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'Correlation.out')
+            os.remove(CODE_EXAM + '/' + 'answers' + '/', 'Correlations.out')
         except:
             pass
         file1 = open(CODE_EXAM + '/' + 'answers' + '/' + 'MissingPrcpData.out', 'w')
         file2 = open(CODE_EXAM + '/' + 'answers' + '/' + 'YearlyAverages.out', 'w')
         file3 = open(CODE_EXAM + '/' + 'answers' + '/' + 'YearHistogram.out', 'w')
-        file4 = open(CODE_EXAM + '/' + 'answers' + '/' + 'Correlation.out', 'w')
+        file4 = open(CODE_EXAM + '/' + 'answers' + '/' + 'Correlations.out', 'w')
         return file1, file2, file3, file4
 
     def get_correlations(self, results, yld_data):
@@ -131,7 +141,6 @@ class Weather():
         return answers
 
     def calculate_correlation(self, x, y):
-        from scipy.stats.stats import pearsonr
         return pearsonr(x, y)
 
     def get_yld_data(self):

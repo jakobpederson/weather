@@ -1,6 +1,5 @@
 from collections import namedtuple
 import os
-import sys
 import unittest
 import weather
 
@@ -10,13 +9,6 @@ TEST_DATA = SOURCE + '/' + 'tests'
 ANSWER = CODE_EXAM + '/' + 'answers' + '/'
 MISSING = -9999
 PATH_WX = CODE_EXAM + 'wx_data' + '/'
-FILE_LIST = [
-    'UC001.txt',
-    'UC002.txt',
-    'UC003.txt',
-    'UC004.txt',
-    'UC005.txt',
-    ]
 
 Day = namedtuple('Day', ['file_name', 'date', 'year', 'high', 'low', 'precip'])
 Avg_Data = namedtuple('Avg_Data', ['name', 'year', 'high', 'low', 'precip'])
@@ -25,16 +17,18 @@ Avg_Data = namedtuple('Avg_Data', ['name', 'year', 'high', 'low', 'precip'])
 class WeatherTest(unittest.TestCase):
 
     @classmethod
-    def setUp(self):
+    def setUpClass(cls):
         try:
             os.remove(ANSWER, 'MissingPrcpData.out')
             os.remove(ANSWER, 'YearlyAverages.out')
             os.remove(ANSWER, 'YearHistogram.out')
+            os.remove(ANSWER, 'Correlations.out')
         except:
             open(ANSWER + 'MissingPrcpData.out', 'w')
             open(ANSWER + 'YearlyAverages.out', 'w')
             open(ANSWER + 'YearHistogram.out', 'w')
-        self.c = weather.Weather()
+            open(ANSWER + 'Correlations.out', 'w')
+        cls.c = weather.Weather()
 
     def test_read_line(self):
         expected = [Day(file_name='USC001.txt', date=19890101, year=1989, high=56.0, low=-50.0, precip=0.0)]
